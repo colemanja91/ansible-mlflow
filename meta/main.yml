@@ -1,0 +1,20 @@
+galaxy_info:
+  author: Jeremiah Coleman
+  description: Installs MLFlow
+  company: your company (optional)
+  license: Apache
+
+  min_ansible_version: 2.5
+
+  platforms:
+  - name: Ubuntu
+    versions:
+    - xenial
+
+  galaxy_tags:
+    - mlflow
+    - ml
+    - ai
+    - spark
+
+dependencies: []

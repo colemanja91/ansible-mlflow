@@ -1,0 +1,40 @@
+---
+
+- name: Check if Miniconda is already installed
+  stat: path={{ miniconda.home }}/bin/conda
+  register: bin_conda
+  changed_when: bin_conda.stat.exists == False
+
+- name: Run Miniconda installation
+  block:
+    - name: download miniconda installer
+      get_url:
+        url={{ miniconda.url }}
+        dest=/tmp/miniconda.sh
+        mode=0755
+      register: miniconda_downloaded
+    - name: install miniconda
+      shell: "/tmp/miniconda.sh -b -p {{ miniconda.home }} creates={{ miniconda.home }} executable=/bin/bash"
+      register: miniconda_installed
+      when: miniconda_downloaded | success
+      notify:
+        - remove miniconda setup script
+        - update conda to latest version
+  when: bin_conda.stat.exists == False
+
+- name: Add condarc config file
+  copy: src={{ item }} dest="~/.{{ item }}"
+  with_items:
+    - condarc
+  when: miniconda.add_condarc
+
+- name: Add Miniconda to the PATH
+  lineinfile:
+    dest: "{{ miniconda_rcfile }}"
+    line: export PATH={{ miniconda_home }}/bin:$PATH
+    state: present
+  when: miniconda.modify_path
+
+- name: Create environments
+  shell: "{{ miniconda.home }}/bin/conda create --yes -q -n {{ item.name }} python={{ item.python_version }} {{ item.pkgs }} creates={{ miniconda.home }}/envs/{{ item.name }}"
+  with_items: miniconda.environments

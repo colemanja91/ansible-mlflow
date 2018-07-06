@@ -1,0 +1,12 @@
+---
+
+miniconda:
+  url: http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh
+  home: '~/miniconda'
+  environments:
+    - name: python
+      python_version: 2.7
+      pkgs: 'pip'
+  modify_path: no
+  rcfile: '~/.bashrc'
+  add_condarc: yes
